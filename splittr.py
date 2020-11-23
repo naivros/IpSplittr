@@ -1,9 +1,11 @@
 import ipaddress
 import sys
 
-axiomCount = int(sys.argv[1])
 
-file = open('ips.txt', 'r')
+axiomCount = int(sys.argv[2])
+path = str(sys.argv[1])
+
+file = open(path, 'r')
 line = file.readlines()
 
 isPrivate = 0
@@ -13,7 +15,7 @@ class Storage():
         self.map = {}
         self.isPrivate = 0;
         self.totalIP = 0;
-        self.axiomCount = int(sys.argv[1])
+        self.axiomCount = int(axiomCount)
     def incPrivateIP(self):
         self.isPrivate = self.isPrivate + 1
     def incTotalIP(self):
@@ -62,21 +64,20 @@ def processData(Storage):
   return lists
 
 
-
 for iprange in line:
   #Clean Input
   iprange = iprange .replace("\n", "")
   iprange = iprange.replace(" ", "")
 
   if (iprange != ""):
-    if int(iprange[(iprange.find("/", 0))+1:]) < 28:
-        networks=list(ipaddress.ip_network(iprange, False).subnets(new_prefix=28))
+    if int(iprange[(iprange.find("/", 0))+1:]) < 29:
+        networks=list(ipaddress.ip_network(iprange, False).subnets(new_prefix=29))
         for smallerNet in networks:
             snet=list(ipaddress.ip_network(str(smallerNet)))
             Storage.processSubnets(str(smallerNet),snet)
     else:
         subnet=list(ipaddress.ip_network(iprange, False).hosts())
-        Storage.processSubnets(iprange,subnet)
+        Storage.processSubnets(iprange,"32")
 
 map = Storage.getMap()
 
@@ -94,13 +95,17 @@ map = Storage.getMap()
 lists = processData(Storage)
 
 def test(lists):
+  print("\n")
+  print("#" * 72)
+  print("Count IP List Sizes / Run Tests")
+  print("#" * 72)
   for key in sorted(lists.keys()):
     count = 0
     for iprange in (lists[key]):
       x=list(ipaddress.ip_network(iprange, False).hosts())
       if x == []:
           x=list(ipaddress.ip_network(iprange, False))
-      count = count + len(x) + 1
+      count = count + len(x) + 2
     print("* ::", key, "::",count, "ips ::")
   print("*"*72)
 ## DoTest
